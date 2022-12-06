@@ -54,4 +54,4 @@ In the example above, the top three Elves are the fourth Elf (with 24000 Calorie
 
 ___
 
-Puzzle by Eric Wastl
+Puzzle by [Eric Wastl](https://github.com/topaz)

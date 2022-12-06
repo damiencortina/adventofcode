@@ -34,6 +34,6 @@ Will return Day 1 Part 2 Puzzle result using exemple puzzle input
 
 ## Credits : ##
 
-**Puzzles** : Eric Wastl
+**Puzzles** : [Eric Wastl](https://github.com/topaz)
 
-**Solution implementations** : Damien Cortina
+**Solution implementations** : [Damien Cortina](https://github.com/damiencortina)
