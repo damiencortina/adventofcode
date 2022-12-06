@@ -30,3 +30,10 @@ php index.php -d 1 -p 2 --test
 ```
 
 Will return Day 1 Part 2 Puzzle result using exemple puzzle input
+
+
+## Credits : ##
+
+**Puzzles** : Eric Wastl
+
+**Solution implementations** : Damien Cortina
