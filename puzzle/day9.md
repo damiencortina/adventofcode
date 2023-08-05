@@ -30,6 +30,7 @@ Due to the aforementioned Planck lengths, the rope must be quite short; in fact,
 ```
 If the head is ever two steps directly up, down, left, or right from the tail, the tail must also move one step in that direction so it remains close enough:
 
+```
 .....    .....    .....
 .TH.. -> .T.H. -> ..TH.
 .....    .....    .....
@@ -39,6 +40,8 @@ If the head is ever two steps directly up, down, left, or right from the tail, t
 .H. -> ... -> .T.
 ...    .H.    .H.
 ...    ...    ...
+```
+
 Otherwise, if the head and tail aren't touching and aren't in the same row or column, the tail always moves one step diagonally to keep up:
 
 ```
@@ -254,4 +257,8 @@ s###..
 
 So, there are 13 positions the tail visited at least once.
 
-Simulate your complete hypothetical series of motions. How many positions does the tail of the rope visit at least once?
+**Simulate your complete hypothetical series of motions. How many positions does the tail of the rope visit at least once?**
+
+___
+
+Puzzle by [Eric Wastl](https://github.com/topaz)
