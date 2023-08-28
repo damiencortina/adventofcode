@@ -32,6 +32,9 @@ class ListPair
             }
         }
         if (count($this->right) === count($this->left)) {
+            // In case the pair study did not reveal anything special
+            // Null allows inspection of the parent pair to continue
+            // (no impact with test data, but it changes the result with the default ones)
             return null;
         } else {
             return true;
