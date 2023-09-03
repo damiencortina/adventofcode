@@ -8,39 +8,38 @@ class Cave
 {
     const SAND_STARTING_X = 500;
     const SAND_STARTING_Y = 0;
+    const X = 0;
+    const Y = 1;
     private array $map = [];
     private int $lowestPosition = 0;
     private int $highestStartingPosition = self::SAND_STARTING_Y;
 
-    // TODO : refactor and simplify construction
     public function __construct(
         string $inputFile
     )
     {
         foreach (file($inputFile) as $inputFileLine) {
             $rockPath = explode(' -> ', $inputFileLine);
-            foreach ($rockPath as $rockPathAngle) {
-                $rockPathAngle = json_decode("[$rockPathAngle]");
-                if (isset($lastRockPathAngle)) {
-                    if ($lastRockPathAngle[0] === $rockPathAngle[0]) { // X remains the same, Y will vary
-                        $range = range($lastRockPathAngle[1], $rockPathAngle[1]);
-                        $x = $rockPathAngle[0];
-                        foreach ($range as $y) {
+            foreach ($rockPath as $endOfWall) {
+                $endOfWall = json_decode("[$endOfWall]");
+                if (isset($startOfWall)) {
+                    if ($startOfWall[self::X] === $endOfWall[self::X]) { // X remains the same, Y will vary
+                        $x = $endOfWall[self::X];
+                        foreach (range($startOfWall[self::Y], $endOfWall[self::Y]) as $y) {
                             if ($y > $this->lowestPosition) $this->lowestPosition = $y;
                             $this->map[$x][$y] = '#';
                         }
                     } else { // X will vary, Y remains the same
-                        $range = range($lastRockPathAngle[0], $rockPathAngle[0]);
-                        $y = $rockPathAngle[1];
-                        foreach ($range as $x) {
+                        $y = $endOfWall[self::Y];
+                        foreach (range($startOfWall[self::X], $endOfWall[self::X]) as $x) {
                             $this->map[$x][$y] = '#';
                         }
                         if ($y > $this->lowestPosition) $this->lowestPosition = $y;
                     }
                 }
-                $lastRockPathAngle = $rockPathAngle;
+                $startOfWall = $endOfWall;
             }
-            unset($lastRockPathAngle);
+            unset($startOfWall);
         }
         $this->lowestPosition += 2;
     }
