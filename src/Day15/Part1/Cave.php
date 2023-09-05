@@ -30,26 +30,43 @@ class Cave
             }
             $this->sensors[] = new Sensor($this, $beacon, ...$sensorData);
         }
+        usort($this->sensors, fn(Sensor $a, Sensor $b) => $a->x > $b->x);
     }
 
     public function getPositionsThatCannotContainTheBeacon(): int
     {
+        $emptyPositions = 0;
         $positionsThatCannotContainTheBeacon = [];
         /** @var Sensor $sensor */
         foreach ($this->sensors as $sensor) {
-            if (in_array(self::ROW, range($sensor->y - $sensor->manhattanDistance, $sensor->y))) {
-                $distance = $sensor->y - self::ROW;
-            } elseif (in_array(self::ROW, range($sensor->y, $sensor->y + $sensor->manhattanDistance))) {
-                $distance = self::ROW - $sensor->y;
-            } else {
-                continue;
+            if ($this->rowIsCrossingSensorArea($sensor)) {
+                $distance = abs($sensor->y - self::ROW);
+                $manhattanDistanceRemaining = $sensor->manhattanDistance - $distance;
+                $localPositionsThatCannotContainTheBeacon = [$sensor->x - $manhattanDistanceRemaining, $sensor->x + $manhattanDistanceRemaining];
+                if (empty($positionsThatCannotContainTheBeacon)) {
+                    $positionsThatCannotContainTheBeacon = $localPositionsThatCannotContainTheBeacon;
+                } else {
+                    if ($positionsThatCannotContainTheBeacon[1] < $localPositionsThatCannotContainTheBeacon[1]) {
+                        if ($positionsThatCannotContainTheBeacon[1] < $localPositionsThatCannotContainTheBeacon[0]) {
+                            $emptyPositions += $localPositionsThatCannotContainTheBeacon[0] - $positionsThatCannotContainTheBeacon[1];
+                        }
+                        $positionsThatCannotContainTheBeacon[1] = $localPositionsThatCannotContainTheBeacon[1];
+                    }
+                    if ($positionsThatCannotContainTheBeacon[0] > $localPositionsThatCannotContainTheBeacon[0]) {
+                        if ($positionsThatCannotContainTheBeacon[0] > $localPositionsThatCannotContainTheBeacon[1]) {
+                            $emptyPositions += $positionsThatCannotContainTheBeacon[0] - $localPositionsThatCannotContainTheBeacon[1];
+                        }
+                        $positionsThatCannotContainTheBeacon[0] = $localPositionsThatCannotContainTheBeacon[0];
+                    }
+                }
             }
-            $manhattanDistanceRemaining = $sensor->manhattanDistance - $distance;
-            $localPositionsThatCannotContainTheBeacon =
-                range($sensor->x - $manhattanDistanceRemaining, $sensor->x + $manhattanDistanceRemaining);
-            $positionsThatCannotContainTheBeacon =
-                array_merge($positionsThatCannotContainTheBeacon, $localPositionsThatCannotContainTheBeacon);
         }
-        return count(array_unique($positionsThatCannotContainTheBeacon)) - $this->beaconAndSensorsPositionsToOmit;
+        return $positionsThatCannotContainTheBeacon[1] - $positionsThatCannotContainTheBeacon[0] - $emptyPositions;
+    }
+
+    private function rowIsCrossingSensorArea(Sensor $sensor): bool
+    {
+        return ($sensor->y > self::ROW && $sensor->y - $sensor->manhattanDistance < self::ROW)
+            || ($sensor->y < self::ROW && $sensor->y + $sensor->manhattanDistance > self::ROW);
     }
 }
