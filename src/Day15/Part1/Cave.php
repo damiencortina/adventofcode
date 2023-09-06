@@ -35,33 +35,47 @@ class Cave
 
     public function getPositionsThatCannotContainTheBeacon(): int
     {
-        $emptyPositions = 0;
-        $positionsThatCannotContainTheBeacon = [];
+        $unknownPositions = 0;
+        $emptyPositionsInterval = [];
         /** @var Sensor $sensor */
         foreach ($this->sensors as $sensor) {
             if ($this->rowIsCrossingSensorArea($sensor)) {
-                $distance = abs($sensor->y - self::ROW);
-                $manhattanDistanceRemaining = $sensor->manhattanDistance - $distance;
-                $localPositionsThatCannotContainTheBeacon = [$sensor->x - $manhattanDistanceRemaining, $sensor->x + $manhattanDistanceRemaining];
-                if (empty($positionsThatCannotContainTheBeacon)) {
-                    $positionsThatCannotContainTheBeacon = $localPositionsThatCannotContainTheBeacon;
+                $sensorDistanceToRow = abs($sensor->y - self::ROW);
+                $manhattanDistanceRemaining = $sensor->manhattanDistance - $sensorDistanceToRow;
+                $currentEmptyPositionsInterval = [$sensor->x - $manhattanDistanceRemaining, $sensor->x + $manhattanDistanceRemaining];
+                if (empty($emptyPositionsInterval)) {
+                    $emptyPositionsInterval = $currentEmptyPositionsInterval;
                 } else {
-                    if ($positionsThatCannotContainTheBeacon[1] < $localPositionsThatCannotContainTheBeacon[1]) {
-                        if ($positionsThatCannotContainTheBeacon[1] < $localPositionsThatCannotContainTheBeacon[0]) {
-                            $emptyPositions += $localPositionsThatCannotContainTheBeacon[0] - $positionsThatCannotContainTheBeacon[1];
-                        }
-                        $positionsThatCannotContainTheBeacon[1] = $localPositionsThatCannotContainTheBeacon[1];
-                    }
-                    if ($positionsThatCannotContainTheBeacon[0] > $localPositionsThatCannotContainTheBeacon[0]) {
-                        if ($positionsThatCannotContainTheBeacon[0] > $localPositionsThatCannotContainTheBeacon[1]) {
-                            $emptyPositions += $positionsThatCannotContainTheBeacon[0] - $localPositionsThatCannotContainTheBeacon[1];
-                        }
-                        $positionsThatCannotContainTheBeacon[0] = $localPositionsThatCannotContainTheBeacon[0];
-                    }
+                    $emptyPositionsInterval[0] = $this->checkLeft($emptyPositionsInterval[0], $currentEmptyPositionsInterval, $unknownPositions);
+                    $emptyPositionsInterval[1] = $this->checkRight($emptyPositionsInterval[1], $currentEmptyPositionsInterval, $unknownPositions);
                 }
             }
         }
-        return $positionsThatCannotContainTheBeacon[1] - $positionsThatCannotContainTheBeacon[0] - $emptyPositions;
+        return $emptyPositionsInterval[1] - $emptyPositionsInterval[0] - $unknownPositions;
+    }
+
+    private function checkLeft(int $emptyPositionsEndingIndex, array $currentEmptyPositionsInterval, int &$emptyPositions)
+    {
+        if ($emptyPositionsEndingIndex > $currentEmptyPositionsInterval[0]) {
+            if ($emptyPositionsEndingIndex > $currentEmptyPositionsInterval[1]) {
+                $emptyPositions += $emptyPositionsEndingIndex - $currentEmptyPositionsInterval[1];
+            }
+            return $currentEmptyPositionsInterval[0];
+        } else {
+            return $emptyPositionsEndingIndex;
+        }
+    }
+
+    private function checkRight(int $emptyPositionsStartingIndex, array $currentEmptyPositionsInterval, int &$emptyPositions)
+    {
+        if ($emptyPositionsStartingIndex < $currentEmptyPositionsInterval[1]) {
+            if ($emptyPositionsStartingIndex < $currentEmptyPositionsInterval[0]) {
+                $emptyPositions += $currentEmptyPositionsInterval[0] - $emptyPositionsStartingIndex;
+            }
+            return $currentEmptyPositionsInterval[1];
+        } else {
+            return $emptyPositionsStartingIndex;
+        }
     }
 
     private function rowIsCrossingSensorArea(Sensor $sensor): bool
