@@ -11,13 +11,12 @@ class Sensor extends Device
     public int $manhattanDistance;
 
     public function __construct(
-        Cave   $cave,
         Beacon $closestBeacon,
         int    $x,
         int    $y
     )
     {
-        parent::__construct($cave, $x, $y);
+        parent::__construct($x, $y);
         $this->closestBeacon = $closestBeacon;
         $this->manhattanDistance = abs($this->closestBeacon->x - $this->x) + abs($this->closestBeacon->y - $this->y);
     }

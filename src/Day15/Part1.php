@@ -12,7 +12,8 @@ class Part1
     public function solve(string $inputFile): int
     {
         $cave = new Cave($inputFile);
-        return $cave->getPositionsThatCannotContainTheBeacon();
+        $scannedRow = $cave->scanRow(2000000);
+        return $scannedRow->getScannedPositions();
     }
 
 }
