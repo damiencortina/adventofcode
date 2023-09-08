@@ -28,11 +28,35 @@ class Cave
             }
             $this->sensors[] = new Sensor($beacon, ...$sensorData);
         }
-        usort($this->sensors, fn(Sensor $a, Sensor $b) => $a->x > $b->x);
+        usort($this->sensors,
+            fn(Sensor $a, Sensor $b) => $a->x - $a->manhattanDistance > $b->x - $b->manhattanDistance);
+        //TODO: sorting is probably useless and won't prevent problems of wrongly considered unknown spaces
     }
 
     public function scanRow(int $row): ScannedRow
     {
         return new ScannedRow($row, $this->sensors);
+    }
+
+
+    public function getDistressBeaconPosition(int $researchPerimeterSize): array
+    {
+        foreach (range(0, $researchPerimeterSize) as $row) {
+            $scannedRow = $this->scanRow($row);
+            if (!empty($scannedRow->unknownRanges)) {
+                foreach ($scannedRow->unknownRanges as $unknownRange) {
+                    if ($unknownRange[0] > 0 && $unknownRange[1] < $researchPerimeterSize) {
+                        return [($unknownRange[1] + $unknownRange[0]) / 2, $row];
+                    }
+                }
+            }
+            if ($scannedRow->range[0] > 0) {
+                return [0, $row];
+            }
+            if ($scannedRow->range[1] < $researchPerimeterSize) {
+                return [$researchPerimeterSize, $row];
+            }
+        }
+        return [0, 0]; //TODO : clean that
     }
 }

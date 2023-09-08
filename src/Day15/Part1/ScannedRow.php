@@ -50,24 +50,25 @@ class ScannedRow
 
     private function isCrossingSensorArea(Sensor $sensor): bool
     {
-        return ($sensor->y > $this->y && $sensor->y - $sensor->manhattanDistance < $this->y)
-            || ($sensor->y < $this->y && $sensor->y + $sensor->manhattanDistance > $this->y);
+        return ($sensor->y > $this->y && $sensor->y - $sensor->manhattanDistance <= $this->y)
+            || ($sensor->y < $this->y && $sensor->y + $sensor->manhattanDistance >= $this->y)
+            || $sensor->y === $this->y;
     }
 
     private function checkLeft(array $currentEmptyPositionsInterval): void
     {
         if ($this->range[0] > $currentEmptyPositionsInterval[0]) {
-            if ($this->range[0] > $currentEmptyPositionsInterval[1]) {
+            if ($this->range[0] - 1 > $currentEmptyPositionsInterval[1]) {
                 $this->unknownRanges[] = [$currentEmptyPositionsInterval[1], $this->range[0]];
             }
-            $this->range[0] = $currentEmptyPositionsInterval[1];
+            $this->range[0] = $currentEmptyPositionsInterval[0];
         }
     }
 
     private function checkRight(array $currentEmptyPositionsInterval): void
     {
         if ($this->range[1] < $currentEmptyPositionsInterval[1]) {
-            if ($this->range[1] < $currentEmptyPositionsInterval[0]) {
+            if ($this->range[1] + 1 < $currentEmptyPositionsInterval[0]) {
                 $this->unknownRanges[] = [$this->range[1], $currentEmptyPositionsInterval[0]];
             }
             $this->range[1] = $currentEmptyPositionsInterval[1];
