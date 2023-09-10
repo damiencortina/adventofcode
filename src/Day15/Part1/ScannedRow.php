@@ -6,15 +6,18 @@ namespace Day15\Part1;
 
 class ScannedRow
 {
-    public array $range = [];
+    public ?array $range = null;
     public array $unknownRanges = [];
     private int $numberOfDevicesOnThisRow = 0;
 
     public function __construct(
         private readonly int   $y,
-        private readonly array $sensors
+        private readonly array $sensors,
+        int                    $from = null,
+        int                    $to = null
     )
     {
+        $scannedRanges = [];
         /** @var Sensor $sensor */
         foreach ($this->sensors as $sensor) {
             if ($sensor->y === $y) {
@@ -23,12 +26,21 @@ class ScannedRow
             if ($this->isCrossingSensorArea($sensor)) {
                 $sensorDistanceToRow = abs($sensor->y - $y);
                 $manhattanDistanceRemaining = $sensor->manhattanDistance - $sensorDistanceToRow;
-                $currentEmptyPositionsInterval = [$sensor->x - $manhattanDistanceRemaining, $sensor->x + $manhattanDistanceRemaining];
-                if (empty($this->range)) {
-                    $this->range = $currentEmptyPositionsInterval;
-                } else {
-                    $this->checkLeft($currentEmptyPositionsInterval);
-                    $this->checkRight($currentEmptyPositionsInterval);
+                $scannedRanges[] = [$sensor->x - $manhattanDistanceRemaining, $sensor->x + $manhattanDistanceRemaining];
+            }
+        }
+        usort($scannedRanges, fn(array $a, array $b) => $a[0] > $b[0]);
+        foreach ($scannedRanges as $scannedRange) {
+            if (!isset($from) || $scannedRange[1] >= $from) {
+                if (!isset($this->range)) {
+                    $this->range = $scannedRange;
+                }
+                if ($this->range[1] < $scannedRange[1]) {
+                    if ($this->range[1] + 1 < $scannedRange[0]) {
+                        $this->unknownRanges[] = [$this->range[1], $scannedRange[0]];
+                    }
+                    $this->range[1] = $scannedRange[1];
+                    if (isset($to) && $this->range[1] >= $to) break;
                 }
             }
         }
@@ -53,25 +65,5 @@ class ScannedRow
         return ($sensor->y > $this->y && $sensor->y - $sensor->manhattanDistance <= $this->y)
             || ($sensor->y < $this->y && $sensor->y + $sensor->manhattanDistance >= $this->y)
             || $sensor->y === $this->y;
-    }
-
-    private function checkLeft(array $currentEmptyPositionsInterval): void
-    {
-        if ($this->range[0] > $currentEmptyPositionsInterval[0]) {
-            if ($this->range[0] - 1 > $currentEmptyPositionsInterval[1]) {
-                $this->unknownRanges[] = [$currentEmptyPositionsInterval[1], $this->range[0]];
-            }
-            $this->range[0] = $currentEmptyPositionsInterval[0];
-        }
-    }
-
-    private function checkRight(array $currentEmptyPositionsInterval): void
-    {
-        if ($this->range[1] < $currentEmptyPositionsInterval[1]) {
-            if ($this->range[1] + 1 < $currentEmptyPositionsInterval[0]) {
-                $this->unknownRanges[] = [$this->range[1], $currentEmptyPositionsInterval[0]];
-            }
-            $this->range[1] = $currentEmptyPositionsInterval[1];
-        }
     }
 }

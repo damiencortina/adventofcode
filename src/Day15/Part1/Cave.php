@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Day15\Part1;
 
+use Exception;
+
 class Cave
 {
     private array $sensors = [];
@@ -28,9 +30,6 @@ class Cave
             }
             $this->sensors[] = new Sensor($beacon, ...$sensorData);
         }
-        usort($this->sensors,
-            fn(Sensor $a, Sensor $b) => $a->x - $a->manhattanDistance > $b->x - $b->manhattanDistance);
-        //TODO: sorting is probably useless and won't prevent problems of wrongly considered unknown spaces
     }
 
     public function scanRow(int $row): ScannedRow
@@ -39,6 +38,9 @@ class Cave
     }
 
 
+    /**
+     * @throws Exception
+     */
     public function getDistressBeaconPosition(int $researchPerimeterSize): array
     {
         foreach (range(0, $researchPerimeterSize) as $row) {
@@ -57,6 +59,6 @@ class Cave
                 return [$researchPerimeterSize, $row];
             }
         }
-        return [0, 0]; //TODO : clean that
+        throw new Exception("Not Found");
     }
 }
