@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Day15;
 
-use Day15\Part1\Cave;
+use Day15\Domain\Cave;
 
 class Part2
 {

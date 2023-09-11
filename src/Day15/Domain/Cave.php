@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Day15\Part1;
+namespace Day15\Domain;
 
 use Exception;
 
