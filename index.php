@@ -1,12 +1,12 @@
 <?php
 
-require 'Autoloader.php';
+require 'vendor/autoload.php';
 
 $options = getopt('d:p:',['test']);
 $day = in_array($options['d'] ?? null, range(1,25)) ? (int)$options['d'] : null;
 $part = in_array($options['p'] ?? null, range(1,2)) ?(int)$options['p'] : null;
 if(isset($day) && isset($part)){
-    Autoloader::register();
+    //Autoloader::register();
     $puzzleClassName = "Day$day\Part$part";
     $puzzle = new $puzzleClassName;
     if(array_key_exists('test',$options)){
